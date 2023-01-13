@@ -3,7 +3,7 @@ USE IEEE.STD_LOGIC_1164.ALL;
 USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
----- input output declaration:------------------------------------------------------------------------------------------------
+---- input output declaration:---------------------------------------------------------------------------------------------------
 entity vars is
     Port(
 		-- in
@@ -12,10 +12,10 @@ entity vars is
 		RS : out std_logic:='1';
 		RW : out std_logic:='0';
 		EN : out std_logic:='1';
-		nbrber : out std_logic_vector (7 downto 0) := "00000000"
+		number : out std_logic_vector (7 downto 0) := "00000000"
 	);
 end vars;
--------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
 
 architecture LCD_COUNTER of vars is
 ---- signals declaration:--------------------------------------------------------------------------------------------------------
@@ -25,6 +25,10 @@ signal add_10 : std_logic := '0';
 signal nbr_units : std_logic_vector (7 downto 0) := "00110000" ; 
 signal nbr_tens : std_logic_vector (7 downto 0) := "00110000" ; 
 signal tmp_clk : std_logic_vector (27 downto 0) := (others => '0') ; 
+---------------------------------------------------------------------------------------------------------------------------------
+--> lcd
+signal lcd_clk : std_logic := '0';
+signal tmp_lcd_clk : std_logic_vector (15 downto 0) := (others => '0') ; 
 ---------------------------------------------------------------------------------------------------------------------------------
 
 begin
@@ -90,6 +94,15 @@ begin
 end process;
 ----end counting-----------------------------------------------------------------------------------------------------------------
 
+----- LCD clock divider		--> 1.3ms divider
+lcd_clk_divider_process : process (clk, tmp_lcd_clk) 
+begin
+	if rising_edge(clk) then
+		tmp_lcd_clk <= tmp_lcd_clk + 1;
+	end if;
+	lcd_clk <= tmp_lcd_clk(15);
+end process;
+-----------------------------------------------------------------------------------------------------------
 
 
 ---------------------------------------------------------------------------------------------------------------------------------
