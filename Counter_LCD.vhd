@@ -27,6 +27,8 @@ signal nbr_tens : std_logic_vector (7 downto 0) := "00110000" ;
 signal tmp_clk : std_logic_vector (27 downto 0) := (others => '0') ; 
 ---------------------------------------------------------------------------------------------------------------------------------
 --> lcd
+type signal_state is (s0,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12,s13);
+signal current_s, next_s: signal_state;
 signal lcd_clk : std_logic := '0';
 signal tmp_lcd_clk : std_logic_vector (15 downto 0) := (others => '0') ; 
 ---------------------------------------------------------------------------------------------------------------------------------
@@ -94,6 +96,8 @@ begin
 end process;
 ----end counting-----------------------------------------------------------------------------------------------------------------
 
+----LCD--------------------------------------------------------------------------------------------------------------------------
+
 ----- LCD clock divider		--> 1.3ms divider
 lcd_clk_divider_process : process (clk, tmp_lcd_clk) 
 begin
@@ -102,10 +106,46 @@ begin
 	end if;
 	lcd_clk <= tmp_lcd_clk(15);
 end process;
------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+lcd_state_process : process (reset, current_s)
+begin
+	if (reset = '1') then
+		current_s <= s0;
+	elsif (rising_edge(lcd_clk)) then
+		current_s <= next_s;
+	end if;
+end process;
 
+lcd_process : process (current_s, nbr_units, nbr_tens)
+begin
+	case current_s is
+	----LCD OPTIONS----------------------------------------------------------------------
+		--DL=1 mode 8bits
+		--NL=1 2 lignes
+		when s0 => Number <= "00111011"; RS <='0'; RW <='0'; EN <= '1'; next_s <= s1;
+		when s1 => EN <= '0'; next_s <= s2;
+		when s2 => Number <= "00001100"; RS <='0'; RW <='0'; EN <= '1'; next_s <= s3;
+		when s3 => EN <= '0'; next_s <= s4;
+		--cursor movement I/D=1 => to the left
+		when s4 => Number <= "00000110"; RS <='0'; RW <='0'; EN <= '1'; next_s <= s5;
+		when s5 => EN <= '0'; next_s <= s6;
+		--erase the memory
+		when s6 => Number <= "00000001"; RS <='0'; RW <='0'; EN <= '1'; next_s <= s7;
+		when s7 => EN <= '0'; next_s <= s8;
+		--cursor to home position
+		when s8 => Number <= "00000010"; RS <='0'; RW <='0'; EN <= '1'; next_s <= s9;
+		when s9 => EN <= '0'; next_s <= s10;
+
+	----SHOW NUMBER ON LCD----------------------------------------------------------------
+		-- show tens
+		when s10 => Number <= nbr_tens; RS <='1'; RW <='0'; EN <= '1'; next_s <= s11;
+		when s11 => EN <= '0'; next_s <= s12;
+		-- show units
+		when s12 => Number <= nbr_units; RS <='1'; RW <='0'; EN <= '1'; next_s <= s13;
+		when s13 => EN <= '0'; next_s <= s8;
+	end case;
+end process;
 
 ---------------------------------------------------------------------------------------------------------------------------------
-
 end LCD_COUNTER ;
 
