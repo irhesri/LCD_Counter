@@ -18,19 +18,38 @@ end vars;
 -------------------------------------------------------------------------------------------------------------------------------
 
 architecture LCD_COUNTER of vars is
----- signals declaration:-----------------------------------------------------------------------------------------------------
+---- signals declaration:--------------------------------------------------------------------------------------------------------
+--> counter
 signal counter_clk : std_logic := '0';
 signal add_10 : std_logic := '0';
 signal nbr_units : std_logic_vector (7 downto 0) := "00110000" ; 
 signal nbr_tens : std_logic_vector (7 downto 0) := "00110000" ; 
------------------------------------------------------------------------------------------------------------------------------
+signal tmp_clk : std_logic_vector (27 downto 0) := (others => '0') ; 
+---------------------------------------------------------------------------------------------------------------------------------
 
 begin
-----counting-----------------------------------------------------------------------------------------------------------------
+---- Counter clock divider	--> 1 second clock-----------------------------------------------------------------------------------
+counter_clk_divider : process(clk, tmp_clk, counter_clk)  
+begin
+	if rising_edge(clk) then
+		if tmp_clk < 50000000 then
+		-- 50MHZ for a rising edge of clk
+			tmp_clk <= tmp_clk + 1;
+			counter_clk <= '0';
+		else
+			tmp_clk <= (others => '0');
+			counter_clk <= '1';
+		end if;
+	end if;
+end process;
+---------------------------------------------------------------------------------------------------------------------------------
+
+----counting---------------------------------------------------------------------------------------------------------------------
 units_counting : process(reset, stop_process, counter_clk, nbr_units, count_up, count_down) 
 begin 
 	if reset = '1' then 
-		nbr_units <= "00110000";  
+		nbr_units <= "00110000";
+		nbr_tens <= "00110000";
 	elsif stop_process /= '1' and rising_edge(counter_clk) then
 		if count_up = '1' and count_down = '0' then
 			if nbr_units < 57 then
@@ -52,9 +71,7 @@ end process;
 
 tens_counting : process(reset, stop_process, add_10, nbr_tens, count_up, count_down) 
 begin 
-	if reset = '1' then 
-		nbr_tens <= "00110000";  
-	elsif stop_process /= '1' and rising_edge(add_10) then
+	if stop_process /= '1' and rising_edge(add_10) then
 		if count_up = '1' and count_down = '0' then
 			if nbr_tens < 57 then 
 				nbr_tens <= nbr_tens + 1;
@@ -73,6 +90,9 @@ begin
 end process;
 ----end counting-----------------------------------------------------------------------------------------------------------------
 
+
+
+---------------------------------------------------------------------------------------------------------------------------------
 
 end LCD_COUNTER ;
 
