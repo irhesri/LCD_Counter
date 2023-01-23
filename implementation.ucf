@@ -14,7 +14,6 @@ NET "Number<5>" LOC = "Y16" ;		# bit 5
 NET "Number<6>" LOC = "AB16" ;	# bit 6
 NET "Number<7>" LOC = "Y15" ;		# bit 7
 
-
 NET "EN" LOC = "AB4" ; 				# Enable
 NET "RS" LOC = "Y14" ; 				# Register Select
 NET "RW" LOC = "W13" ; 				# Read/Write Control

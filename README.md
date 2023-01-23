@@ -7,4 +7,4 @@
 <br><br>
 LCD instructions: <br>
 <img src="./img/LCD_INSTRUCTIONS.png">
-<br><br><br><br></b>
+<br><br><br><br></b>  
