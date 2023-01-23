@@ -55,11 +55,11 @@ units_counting : process(reset, stop_process, counter_clk, nbr_units, count_up, 
 begin 
 	if reset = '1' then 
 		nbr_units <= "00110000";
-		nbr_tens <= "00110000";
 	elsif stop_process /= '1' and rising_edge(counter_clk) then
 		if count_up = '1' and count_down = '0' then
 			if nbr_units < 57 then
 				nbr_units <= nbr_units + 1;
+				add_10 <= '0';
 			else
 				nbr_units <= "00110000";
 				add_10 <= '1';
@@ -67,6 +67,7 @@ begin
 		elsif count_up = '0' and count_down = '1' then
 			if nbr_units > 48 then
 				nbr_units <= nbr_units - 1;
+				add_10 <= '0';
 			else 
 				nbr_units <= "00111001";
 				add_10 <= '1';
@@ -77,7 +78,9 @@ end process;
 
 tens_counting : process(reset, stop_process, add_10, nbr_tens, count_up, count_down) 
 begin 
-	if stop_process /= '1' and rising_edge(add_10) then
+	if reset = '1' then 
+		nbr_tens <= "00110000";
+	elsif stop_process /= '1' and rising_edge(add_10) then
 		if count_up = '1' and count_down = '0' then
 			if nbr_tens < 57 then 
 				nbr_tens <= nbr_tens + 1;
@@ -91,7 +94,6 @@ begin
 				nbr_tens <= "00111001";
 			end if;
 		end if;
-		add_10 <= '0';
 	end if;
 end process;
 ----end counting-----------------------------------------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ end process;
 ----LCD--------------------------------------------------------------------------------------------------------------------------
 
 ----- LCD clock divider		--> 1.3ms divider
-lcd_clk_divider_process : process (clk, tmp_lcd_clk) 
+lcd_clk_divider_process : process (clk, lcd_clk, tmp_lcd_clk) 
 begin
 	if rising_edge(clk) then
 		tmp_lcd_clk <= tmp_lcd_clk + 1;
@@ -107,7 +109,7 @@ begin
 	lcd_clk <= tmp_lcd_clk(15);
 end process;
 ---------------------------------------------------------------------------------------------------------------------------------
-lcd_state_process : process (reset, current_s)
+lcd_state_process : process (reset, lcd_clk, current_s)
 begin
 	if (reset = '1') then
 		current_s <= s0;

@@ -1,0 +1,20 @@
+NET "clk" LOC = "E12" ; 			#50MHz
+
+NET "reset" LOC = "T9" ;			#reset
+NET "stop_process" LOC = "U8" ;	#pause
+NET "count_down" LOC = "U10" ;	#down
+NET "count_up" LOC = "V8" ;		#up
+
+NET "Number<0>" LOC = "Y13" ;		# bit 0
+NET "Number<1>" LOC = "AB18" ;	# bit 1
+NET "Number<2>" LOC = "AB17" ;	# bit 2
+NET "Number<3>" LOC = "AB12" ;	# bit 3
+NET "Number<4>" LOC = "AA12" ;	# bit 4
+NET "Number<5>" LOC = "Y16" ;		# bit 5
+NET "Number<6>" LOC = "AB16" ;	# bit 6
+NET "Number<7>" LOC = "Y15" ;		# bit 7
+
+
+NET "EN" LOC = "AB4" ; 				# Enable
+NET "RS" LOC = "Y14" ; 				# Register Select
+NET "RW" LOC = "W13" ; 				# Read/Write Control
